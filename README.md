@@ -4,4 +4,6 @@ The languages that are supported are Scala and C++. The program creates processe
 
 I hope I will be able to expand that project in the future by creating a Website which will allow users to upload their solutions to given problems and then compile and test the given solutions.
 
+The testScala.scala and testCpp.cpp files that are given are example solutions to the problem "Read an integer and return its square and cube". I am using them to test the judge. The input and output files for that problem are in the Problem1 folder.
+
 I will be happy to hear any sort of feedback.
