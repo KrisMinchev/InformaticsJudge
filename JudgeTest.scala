@@ -26,13 +26,11 @@ object Judge{
             case _ => run
         }
         val result = (inp #> panderToWindows1).!!
-        //print(result)
         if(out.!! == result) return "OK"
         else return "WA"
     }
 
     def judgeScala(problem: String, name: String): String={
-        //val fullName = raw".\" + problem + raw"\Solutions\" + name
         if(compileScala(problem, name))
         {
             var i = 1
@@ -46,9 +44,6 @@ object Judge{
         }
         else return "CE"
     }
-
-    // g++ -o program cppTest.cpp
-    // .\program.exe
 
     def compileCpp(problem: String, name: String): Boolean=
     {
