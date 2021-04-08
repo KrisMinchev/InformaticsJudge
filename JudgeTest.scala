@@ -1,12 +1,15 @@
 import scala.sys.process._
 import java.io.File
+import java.util.Calendar
 
 object Judge{
 
-    def compileScala(problem: String, name: String): Boolean={
+    def deleteFile(filename: String) = { new File(filename).delete() }
+
+    def compileScala(problem: String, name: String, dir: String): Boolean={
         
         // Create a "fsc filename.scala" process for the command prompt
-        val compile = Seq("fsc", name)
+        val compile = Seq("fsc", dir + name)
 
         // The "fsc" command won't be recognized on windows if that piece of code is not included
         val os = sys.props("os.name").toLowerCase
@@ -23,7 +26,7 @@ object Judge{
         return compiled
     }
 
-    def runScala(problem: String, name: String, inputFile: String, outputFile: String): String ={
+    def runScala(problem: String, name: String, inputFile: String, outputFile: String, dir: String): String ={
 
         // Note: All codes which are to be tested should be objects which name is Solution
         // Create a "fsc filename.scala" process for the command prompt
@@ -48,27 +51,30 @@ object Judge{
         else return "WA"
     }
 
-    def judgeScala(problem: String, name: String, tests: Int): String={
+    def judgeScala(user: String, problem: String, name: String, tests: Int): String={
 
+        val dir = raw".\" + problem + raw"\Solutions\" + user + raw"\"
         //Combining compileScala and runScala functions
-        if(compileScala(problem, name))
+        if(compileScala(problem, name, dir))
         {
             var i = 1
             var result = "OK"
             while(result == "OK" && i <= tests)
             {
-                result = runScala(problem, name, raw".\" + problem + raw"\Tests\in" + i + ".txt", raw".\" + problem + raw"\Tests\out" + i + ".txt")
+                result = runScala(problem, name, raw".\" + problem + raw"\Tests\in" + i + ".txt", raw".\" + problem + raw"\Tests\out" + i + ".txt", dir)
                 i += 1
             }
+            deleteFile("Solution.class")
+            deleteFile("Solution$.class")
             return result
         }
         else return "CE"
     }
 
-    def compileCpp(problem: String, name: String): Boolean={
+    def compileCpp(problem: String, name: String, dir: String): Boolean={
 
         // Create a "g++ -o program filename.cpp" process for the command prompt
-        val compile = Seq("g++", "-o", "program", name)
+        val compile = Seq("g++", "-o", "program", dir + name)
 
         // The "g++" command won't be recognized on windows if that piece of code is not included
         val os = sys.props("os.name").toLowerCase
@@ -85,11 +91,11 @@ object Judge{
         return compiled
     }
 
-    def runCpp(problem: String, name: String, inputFile: String, outputFile: String): String ={
+    def runCpp(problem: String, name: String, inputFile: String, outputFile: String, dir: String): String ={
 
         // Note: All codes which are to be tested should be objects which name is Solution
         // Create a "fsc filename.scala" process for the command prompt
-        val run = Seq(raw".\program.exe")
+        val run = Seq("program.exe")
 
         // Extract input and output 
         val inp = Process.cat(new File(inputFile))
@@ -110,25 +116,37 @@ object Judge{
         else return "WA"
     }
 
-    def judgeCpp(problem: String, name: String, tests: Int): String={
-
+    def judgeCpp(user: String, problem: String, name: String, tests: Int): String={
+                
+        val dir = raw".\" + problem + raw"\Solutions\" + user + raw"\"
         // Combining compileCpp and runCpp functions
-        if(compileCpp(problem, name))
+        if(compileCpp(problem, name, dir))
         {
             var i = 1
             var result = "OK"
             while(result == "OK" && i <= tests)
             {
-                result = runCpp(problem, name, raw".\" + problem + raw"\Tests\in" + i + ".txt", raw".\" + problem + raw"\Tests\out" + i + ".txt")
+                result = runCpp(problem, name, raw".\" + problem + raw"\Tests\in" + i + ".txt", raw".\" + problem + raw"\Tests\out" + i + ".txt", dir)
                 i += 1
             }
+            deleteFile("program.exe")
             return result
         }
         else return "CE"
     }
 
+    def judge(user: String, problem: String, filename: String, tests: Int): String={
+        val splitfilename = filename.split('.').toList
+        val ext = splitfilename.last
+        val result = ext match {
+            case "scala" => judgeScala(user, problem, filename, tests)
+            case "cpp" => judgeCpp(user, problem, filename, tests)
+            case _ => "File not supported"
+        }
+        return Calendar.getInstance().getTime().toString + " " * 5 + user + (" " * (20 - user.length)) + problem + (" " * (20 - problem.length)) + result
+    }
     def main(args: Array[String]):Unit={
-        println(judgeScala("Problem1", "scalaTest.scala", 4))
-        println(judgeCpp("Problem1", "cppTest.cpp", 4))
+        println(judge("user1", "Problem1", "scalaTest.scala", 4))
+        println(judge("user2", "Problem1", "cppTest.cpp", 4))
     }
 }
