@@ -1,6 +1,7 @@
 import scala.sys.process._
 import java.io.File
 import java.util.Calendar
+import scala.collection.immutable._
 
 object Judge{
 
@@ -145,6 +146,7 @@ object Judge{
         }
         return Calendar.getInstance().getTime().toString + " " * 5 + user + (" " * (20 - user.length)) + problem + (" " * (20 - problem.length)) + result
     }
+
     def main(args: Array[String]):Unit={
         println(judge("user1", "Problem1", "scalaTest.scala", 4))
         println(judge("user2", "Problem1", "cppTest.cpp", 4))
